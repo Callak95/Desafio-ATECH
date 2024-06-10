@@ -15,19 +15,26 @@
       @close-detail="closeDetail"
       @update-pessoa="updatePessoa"
       @cancel-edit="cancelEdit"
+      @update-pessoas="setPessoas"
     />
+    <div v-if="message" :class="['alert', `alert-${message.type}`]" role="alert">
+      {{ message.text }}
+    </div>
   </div>
 </template>
 
 <script>
+import api from '@/services/api';
+
 export default {
   name: 'App',
   data() {
     return {
-      pessoas: JSON.parse(localStorage.getItem('pessoas')) || [],
+      pessoas: [],
       selectedPessoa: null,
       nextId: 1,
-      isEditing: false
+      isEditing: false,
+      message: null
     };
   },
   methods: {
@@ -35,10 +42,12 @@ export default {
       this.$router.push({ name: page });
     },
     addPessoa(pessoa) {
-      pessoa.id = this.nextId++;
       this.pessoas.push(pessoa);
-      this.saveToLocalStorage();
       this.navigateTo('listagem');
+      this.message = { type: 'success', text: 'Usuário cadastrado com sucesso' };
+      setTimeout(() => {
+        this.message = null;
+      }, 2000);
     },
     selectPessoa(pessoa) {
       this.selectedPessoa = pessoa;
@@ -54,11 +63,16 @@ export default {
       const index = this.pessoas.findIndex(p => p.id === pessoa.id);
       if (index !== -1) {
         this.pessoas.splice(index, 1, pessoa);
+        this.message = { type: 'success', text: 'Usuário atualizado com sucesso' };
+      } else {
+        this.message = { type: 'error', text: 'Erro ao atualizar usuário' };
       }
-      this.saveToLocalStorage();
       this.selectedPessoa = null;
       this.isEditing = false;
       this.navigateTo('listagem');
+      setTimeout(() => {
+        this.message = null;
+      }, 2000);
     },
     closeDetail() {
       this.selectedPessoa = null;
@@ -69,21 +83,41 @@ export default {
       this.navigateTo('listagem');
     },
     deletePessoa(id) {
-      this.pessoas = this.pessoas.filter(p => p.id !== id);
-      if (this.selectedPessoa && this.selectedPessoa.id === id) {
-        this.selectedPessoa = null;
-      }
-      this.saveToLocalStorage();
+      api.excluirPessoa(id)
+        .then(() => {
+          this.pessoas = this.pessoas.filter(p => p.id !== id);
+          if (this.selectedPessoa && this.selectedPessoa.id === id) {
+            this.selectedPessoa = null;
+          }
+          this.message = { type: 'success', text: 'Usuário excluído com sucesso' };
+          setTimeout(() => {
+            this.message = null;
+            this.atualizarListagem();
+          }, 2000);
+        })
+        .catch(() => {
+          setTimeout(() => {
+            this.message = null;
+            this.atualizarListagem();
+          }, 2000);
+        });
     },
-    saveToLocalStorage() {
-      localStorage.setItem('pessoas', JSON.stringify(this.pessoas));
+    setPessoas(novasPessoas) {
+      this.pessoas = novasPessoas;
+    },
+    atualizarListagem() {
+      api.listarPessoas().then(response => {
+        this.pessoas = response.data;
+      });
     }
+  },
+  mounted() {
+    this.atualizarListagem();
   }
 };
 </script>
 
 <style scoped>
-/* Estilos personalizados */
 body {
   background-color: #2c2c2c;
   font-family: Arial, sans-serif;
@@ -100,7 +134,7 @@ body {
 }
 h1 {
   margin-bottom: 50px;
-  padding-left: 120px; /* Espaçamento para acomodar a logo */
+  padding-left: 120px;
 }
 .btn {
   margin: 20px;
@@ -157,6 +191,16 @@ h1 {
 }
 .alert {
   margin-top: 10px;
+}
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 .logo {
   position: absolute;

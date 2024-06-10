@@ -28,13 +28,23 @@
       <p><strong>Telefone:</strong> {{ selectedPessoa.telefone }}</p>
       <button class="btn btn-secondary" @click="closeDetail">Fechar</button>
     </div>
+    <div v-if="message" :class="['alert', `alert-${message.type}`]" role="alert">
+      {{ message.text }}
+    </div>
   </div>
 </template>
 
 <script>
+import api from '@/services/api';
+
 export default {
   name: 'PessoaList',
   props: ['pessoas', 'selectedPessoa'],
+  data() {
+    return {
+      message: null
+    };
+  },
   methods: {
     viewPessoa(pessoa) {
       this.$emit('view-pessoa', pessoa);
@@ -43,7 +53,21 @@ export default {
       this.$emit('edit-pessoa', pessoa);
     },
     deletePessoa(id) {
-      this.$emit('delete-pessoa', id);
+      api.excluirPessoa(id)
+        .then(() => {
+          this.$emit('delete-pessoa', id);
+          this.message = { type: 'success', text: 'Usuário excluído com sucesso' };
+          setTimeout(() => {
+            this.message = null;
+            this.$emit('update-pessoas');
+          }, 2000);
+        })
+        .catch(() => {
+          setTimeout(() => {
+            this.message = null;
+            this.$emit('update-pessoas');
+          }, 2000);
+        });
     },
     closeDetail() {
       this.$emit('close-detail');
@@ -58,5 +82,15 @@ export default {
   padding: 20px;
   border-radius: 10px;
   margin-top: 20px;
+}
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 </style>
