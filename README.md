@@ -1,11 +1,9 @@
-```markdown
 # Avaliação Técnica Atech - Embraer.
 
 - [Funcionalidades](#funcionalidades)
 - [Executar Aplicação](#executar-aplicação)
 - [Endpoints da API Mockada](#endpoints-da-api-mockada)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Estrutura do Projeto](#estrutura-do-projeto)
 
 ### Funcionalidades
 

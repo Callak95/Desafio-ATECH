@@ -59,7 +59,7 @@ export default {
           this.message = { type: 'success', text: 'Usuário excluído com sucesso' };
           setTimeout(() => {
             this.message = null;
-            location.reload(); // Atualiza a página
+            location.reload();
           }, 2000);
         })
         .catch(() => {
