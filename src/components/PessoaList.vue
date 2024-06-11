@@ -59,14 +59,13 @@ export default {
           this.message = { type: 'success', text: 'Usuário excluído com sucesso' };
           setTimeout(() => {
             this.message = null;
-            this.$emit('update-pessoas');
+            location.reload(); // Atualiza a página
           }, 2000);
         })
         .catch(() => {
           setTimeout(() => {
             this.message = null;
-            this.$emit('update-pessoas');
-          }, 2000);
+          }, 3000);
         });
     },
     closeDetail() {

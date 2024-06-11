@@ -47,7 +47,8 @@ export default {
       this.message = { type: 'success', text: 'Usuário cadastrado com sucesso' };
       setTimeout(() => {
         this.message = null;
-      }, 2000);
+        location.reload();
+      }, 1000);
     },
     selectPessoa(pessoa) {
       this.selectedPessoa = pessoa;
@@ -72,7 +73,8 @@ export default {
       this.navigateTo('listagem');
       setTimeout(() => {
         this.message = null;
-      }, 2000);
+        location.reload();
+      }, 1000);
     },
     closeDetail() {
       this.selectedPessoa = null;
@@ -92,14 +94,13 @@ export default {
           this.message = { type: 'success', text: 'Usuário excluído com sucesso' };
           setTimeout(() => {
             this.message = null;
-            this.atualizarListagem();
-          }, 2000);
+            location.reload(); 
+          }, 1000);
         })
         .catch(() => {
           setTimeout(() => {
             this.message = null;
-            this.atualizarListagem();
-          }, 2000);
+          }, 1000);
         });
     },
     setPessoas(novasPessoas) {
@@ -108,6 +109,8 @@ export default {
     atualizarListagem() {
       api.listarPessoas().then(response => {
         this.pessoas = response.data;
+      }).catch(() => {
+        this.message = null;
       });
     }
   },
